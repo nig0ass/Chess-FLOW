@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Ulubieni szachiści</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Twoi ulubieni szachiści</h2>
+    <ul>
+        {% for player in favorite_players %}
+            <li>
+                <strong>{{ player.name }}</strong> - Ranking: {{ player.ranking }}
+                <br>
+                <a href="{{ url_for('profile', player_id=player.id) }}">Zobacz profil</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('dashboard') }}">Wróć do panelu</a>
+</body>
+</html>

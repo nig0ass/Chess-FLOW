@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil użytkownika</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Profil: {{ player.name }}</h2>
+    <p>Ranking: {{ player.ranking }}</p>
+    <p>Bio: {{ player.bio }}</p>
+
+    <form action="{{ url_for('add_favorite', player_id=player.id) }}" method="POST">
+        <button type="submit">Dodaj do ulubionych</button>
+    </form>
+
+    <a href="{{ url_for('dashboard') }}">Wróć do panelu</a>
+</body>
+</html>

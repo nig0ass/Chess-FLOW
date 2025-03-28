@@ -29,7 +29,7 @@ with app.app_context():
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Strona główna - przekierowanie do dashboard, jeśli użytkownik jest zalogowany
+# Strona główna
 @app.route('/')
 def home():
     return redirect(url_for('dashboard')) if current_user.is_authenticated else redirect(url_for('login'))
@@ -60,6 +60,12 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
 
+        if user:
+            print("Znaleziono użytkownika:", user.username)
+            print("Hasło z bazy:", user.password)
+            print("Hasło wpisane:", password)
+            print("Czy hasło poprawne:", check_password_hash(user.password, password))
+        
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('dashboard'))

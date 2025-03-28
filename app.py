@@ -9,7 +9,8 @@ app = Flask(__name__)
 
 # Konfiguracja aplikacji
 app.config['SECRET_KEY'] = 'tajnyklucz'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///szachy.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///szachy.db")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Optymalizacja SQLAlchemy
 
 # Inicjalizacja bazy danych
 db.init_app(app)
@@ -19,6 +20,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Tworzenie tabel przy starcie aplikacji
+with app.app_context():
+    db.create_all()
+
 # Funkcja do ładowania użytkownika
 @login_manager.user_loader
 def load_user(user_id):
@@ -27,9 +32,7 @@ def load_user(user_id):
 # Strona główna - przekierowanie do dashboard, jeśli użytkownik jest zalogowany
 @app.route('/')
 def home():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+    return redirect(url_for('dashboard')) if current_user.is_authenticated else redirect(url_for('login'))
 
 # Rejestracja użytkownika
 @app.route('/register', methods=['GET', 'POST'])
@@ -55,14 +58,13 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('dashboard'))
         else:
-            flash('Login failed. Check your username and/or password', category='error')
+            flash('Błędny login lub hasło', category='error')
 
     return render_template('login.html')
 
@@ -124,5 +126,5 @@ def favorites():
 
 # Uruchamianie aplikacji
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Pobiera port z env, domyślnie 5000
+    port = int(os.environ.get("PORT", 10000))  # Pobiera PORT z env, domyślnie 10000
     app.run(host="0.0.0.0", port=port, debug=True)
